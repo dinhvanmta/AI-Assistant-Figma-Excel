@@ -1,4 +1,8 @@
-# Các Đối Tượng Sử Dụng Hệ Thống
+---
+id: index
+title: Các Đối Tượng Sử Dụng
+sidebar_position: 1
+---
 
 ## 1. Danh sách Actor
 
@@ -15,37 +19,33 @@
 
 ```mermaid
 flowchart LR
-    DS(["👨‍🎨 Designer\n(Lâm Anh)"])
-    BA(["👤 BA / BrSE\n(Đình Văn)"])
-    SALES(["💼 Sales\n(Tâm)"])
-    AI(["🤖 AI Engine\n(Claude/ChatGPT)"])
-    KH(["🏢 Khách hàng"])
+    DS(["Designer\n(Lam Anh)"])
+    BA(["BA / BrSE\n(Dinh Van)"])
+    SALES(["Sales\n(Tam)"])
+    AI(["AI Engine\n(Claude/ChatGPT)"])
+    KH(["Khach hang"])
 
-    subgraph SYS["Hệ thống AI Assistant"]
-        UC1["Tạo tài liệu\nlần đầu"]
-        UC2["Cập nhật\ntài liệu"]
-        UC3["Review\ntài liệu"]
+    subgraph SYS["He thong AI Assistant"]
+        UC1["Tao tai lieu\nlan dau"]
+        UC2["Cap nhat\ntai lieu"]
+        UC3["Review\ntai lieu"]
         UC4["Xem Diff\nReport"]
-        UC5["Parse & Generate\ntự động"]
-        UC6["Tư vấn &\nKiểm tra"]
+        UC5["Parse & Generate\ntu dong"]
+        UC6["Tu van &\nKiem tra"]
     end
 
-    DS -->|"Cung cấp Figma"| UC1
-    DS -->|"Cập nhật Figma"| UC2
-
-    BA -->|"Khởi động"| UC1
+    DS -->|"Cung cap Figma"| UC1
+    DS -->|"Cap nhat Figma"| UC2
+    BA -->|"Khoi dong"| UC1
     BA -->|"Trigger update"| UC2
     BA -->|"Review output"| UC3
-    BA -->|"Xem thay đổi"| UC4
-
+    BA -->|"Xem thay doi"| UC4
     SALES --> UC6
-    SALES -->|"Review bổ sung"| UC3
-
+    SALES -->|"Review bo sung"| UC3
     AI --> UC5
     UC5 -.->|"include"| UC1
     UC5 -.->|"include"| UC2
-
-    UC3 -->|"Gửi tài liệu"| KH
+    UC3 -->|"Gui tai lieu"| KH
     UC6 -.->|"extend"| UC3
 ```
 
@@ -63,8 +63,8 @@ flowchart LR
 | **Quyền hạn** | Chỉnh sửa Figma, không có quyền trên tool AI |
 
 **Yêu cầu từ Designer:**
-- Đặt tên Frame theo quy ước: `[ScreenID]_[ScreenName]` (ví dụ: `SC01_Login`)
-- Đặt tên Component theo loại: `btn_`, `inp_`, `txt_`, `tbl_`, `modal_`
+- Đặt tên Frame: `[ScreenID]_[ScreenName]` (ví dụ: `SC01_Login`)
+- Đặt tên Component: `btn_`, `inp_`, `txt_`, `tbl_`, `modal_`
 - Thiết lập Prototype connections đầy đủ trước khi trigger generate
 
 ---
@@ -77,14 +77,6 @@ flowchart LR
 | **Tương tác với hệ thống** | Trực tiếp – sử dụng tool để generate và review |
 | **Trách nhiệm** | Nhập Figma URL, trigger generate, review output, approve và gửi khách |
 | **Quyền hạn** | Toàn quyền trên tool: configure, run, approve, export |
-
-**Công việc chính:**
-1. Nhập Figma URL + Access Token vào hệ thống
-2. Chọn Excel template phù hợp
-3. Trigger Initial Setup hoặc Update Mode
-4. Review tài liệu được generate
-5. Sửa thủ công nếu cần (business logic, wording tiếng Nhật)
-6. Approve và gửi cho khách hàng
 
 ---
 
@@ -104,19 +96,7 @@ flowchart LR
 | Trường | Nội dung |
 |--------|----------|
 | **Vai trò** | Xử lý tự động toàn bộ pipeline AI |
-| **Tương tác** | Nhận input từ Figma Parser, trả về nội dung tiếng Nhật |
-| **Trách nhiệm** | Parse component, generate nội dung, mapping vào template |
 | **Giới hạn** | Không tự approve hay gửi tài liệu – luôn cần con người review |
-
----
-
-### 3.5 Khách hàng
-
-| Trường | Nội dung |
-|--------|----------|
-| **Vai trò** | Người nhận và phê duyệt tài liệu cuối cùng |
-| **Tương tác** | Không tương tác với hệ thống, chỉ nhận file Excel |
-| **Kỳ vọng** | Tài liệu đúng format, nội dung tiếng Nhật chuẩn xác |
 
 ---
 
@@ -129,6 +109,5 @@ flowchart LR
 | Trigger Update Mode | ❌ | ✅ | ❌ | ❌ |
 | Parse & Generate tự động | ❌ | ❌ | ❌ | ✅ |
 | Review tài liệu | ❌ | ✅ | ✅ | ❌ |
-| Sửa thủ công Excel | ❌ | ✅ | ❌ | ❌ |
 | Approve tài liệu | ❌ | ✅ | ⚠️ (tư vấn) | ❌ |
 | Gửi tài liệu cho khách | ❌ | ✅ | ✅ | ❌ |

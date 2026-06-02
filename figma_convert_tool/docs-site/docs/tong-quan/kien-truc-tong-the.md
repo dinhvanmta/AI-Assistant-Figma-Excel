@@ -1,19 +1,25 @@
-# Kiến Trúc Tổng Thể Hệ Thống
+---
+id: kien-truc-tong-the
+title: Kiến Trúc Tổng Thể
+sidebar_position: 2
+---
 
 ## 1. Sơ đồ Kiến trúc Thành phần
 
+> **Lưu ý:** Nhãn trong sơ đồ dùng tiếng Anh để đảm bảo hiển thị đúng. Bảng mô tả bên dưới giải thích chi tiết bằng tiếng Việt.
+
 ```mermaid
 flowchart TB
-    DS(["👤 Designer"])
-    BA(["👤 BA / BrSE"])
-    KH(["👤 Khách hàng"])
+    DS(["Designer"])
+    BA(["BA / BrSE"])
+    KH(["Khach hang"])
 
-    subgraph FIGMA["🎨 Figma Platform"]
+    subgraph FIGMA["Figma Platform"]
         FIG["Figma File\n(Screens & Components)"]
         FAPI["Figma API"]
     end
 
-    subgraph ENGINE["⚙️ AI Processing Engine"]
+    subgraph ENGINE["AI Processing Engine"]
         PARSER["Figma Parser\n(Screen Structure Analyzer)"]
         DETECT["Component Detector\n(button/input/text/table/modal)"]
         DIFF["Diff Analyzer\n(Compare versions)"]
@@ -21,38 +27,32 @@ flowchart TB
         MAPPER["Template Mapper\n(Field Mapping Engine)"]
     end
 
-    subgraph OUTPUT["📤 Output Engine"]
+    subgraph OUTPUT["Output Engine"]
         EXCEL1["Excel Generator\n(画面概要仕様書)"]
         EXCEL2["Excel Generator\n(画面遷移仕様書)"]
         REPORT["Diff Reporter\n(Change Highlight)"]
     end
 
-    subgraph STORE["🗄️ Version Store"]
-        SNAP["Previous Version\nSnapshot"]
+    subgraph STORE["Version Store"]
+        SNAP["Previous Version Snapshot"]
     end
 
-    DS -->|"Cập nhật thiết kế"| FIG
+    DS -->|"Update design"| FIG
     FIG --> FAPI
-    FAPI -->|"Dữ liệu màn hình"| PARSER
-
-    PARSER -->|"Danh sách screens"| DETECT
-    PARSER -->|"So sánh phiên bản"| DIFF
-
-    DIFF -->|"Lưu/Đọc snapshot"| SNAP
-    DIFF -->|"Chỉ phần thay đổi"| MAPPER
-
+    FAPI -->|"Screen data"| PARSER
+    PARSER -->|"Screen list"| DETECT
+    PARSER -->|"Compare version"| DIFF
+    DIFF -->|"Read/Write snapshot"| SNAP
+    DIFF -->|"Changed parts only"| MAPPER
     DETECT -->|"Component metadata"| AI
-    AI -->|"Nội dung tiếng Nhật"| MAPPER
-
-    MAPPER -->|"Đặc tả màn hình"| EXCEL1
-    MAPPER -->|"Đặc tả chuyển màn hình"| EXCEL2
-    DIFF -->|"Báo cáo thay đổi"| REPORT
-
+    AI -->|"Japanese content"| MAPPER
+    MAPPER -->|"Screen spec"| EXCEL1
+    MAPPER -->|"Transition spec"| EXCEL2
+    DIFF -->|"Change report"| REPORT
     EXCEL1 -->|"Review & Approve"| BA
     EXCEL2 -->|"Review & Approve"| BA
-    REPORT -->|"Xem thay đổi"| BA
-
-    BA -->|"Gửi tài liệu"| KH
+    REPORT -->|"View changes"| BA
+    BA -->|"Send document"| KH
 ```
 
 ---
@@ -96,20 +96,20 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-    subgraph INPUT["📥 Đầu vào"]
+    subgraph INPUT["Input (Dau vao)"]
         F1[Figma File URL]
         F2[Excel Template]
         F3[Previous Snapshot]
     end
 
-    subgraph ENGINE["⚙️ AI Engine"]
+    subgraph ENGINE["AI Engine"]
         E1[Parse & Detect]
         E2[Diff Analysis]
         E3[AI Generate]
         E4[Template Mapping]
     end
 
-    subgraph OUTPUT["📤 Đầu ra"]
+    subgraph OUTPUT["Output (Dau ra)"]
         O1["画面概要仕様書 Excel"]
         O2["画面遷移仕様書 Excel"]
         O3[Diff Report]

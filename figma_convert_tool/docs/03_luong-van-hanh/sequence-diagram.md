@@ -2,132 +2,118 @@
 
 ## 1. Sequence – Initial Setup
 
-```plantuml
-@startuml Sequence_InitialSetup
-!theme plain
-skinparam sequenceMessageAlign center
-title Sequence Diagram: Initial Setup
+```mermaid
+sequenceDiagram
+    actor BA as BA / BrSE
+    participant SYS as Hệ thống AI Assistant
+    participant FAPI as Figma API
+    participant AI as AI Engine (Claude/ChatGPT)
+    participant EXCEL as Excel Generator
+    participant DB as Version Store
 
-actor "BA / BrSE" as BA
-participant "Hệ thống\nAI Assistant" as SYS
-participant "Figma API" as FAPI
-participant "AI Engine\n(Claude/ChatGPT)" as AI
-participant "Excel\nGenerator" as EXCEL
-database "Version\nStore" as DB
+    BA->>SYS: Nhập Figma URL + Token + chọn Template
+    SYS->>FAPI: GET /files/{file_key}
+    FAPI-->>SYS: Trả về cấu trúc file (frames, components, prototypes)
 
-BA -> SYS: Nhập Figma URL + Token\n+ chọn Template
-SYS -> FAPI: GET /files/{file_key}
-FAPI --> SYS: Trả về cấu trúc file\n(frames, components, prototypes)
+    SYS->>SYS: Parse danh sách screens và detect components
 
-SYS -> SYS: Parse danh sách screens\nvà detect components
+    loop Từng Screen
+        SYS->>AI: Gửi component metadata (type, name, properties)
+        AI-->>SYS: Nội dung tiếng Nhật (mô tả, tên trường, hành động)
+    end
 
-loop Từng Screen
-  SYS -> AI: Gửi component metadata\n(type, name, properties)
-  AI --> SYS: Nội dung tiếng Nhật\n(mô tả, tên trường, hành động)
-end
+    SYS->>EXCEL: Mapping nội dung vào template
+    EXCEL->>EXCEL: Apply format (font, merge, border)
+    EXCEL-->>SYS: File 画面概要仕様書 + File 画面遷移仕様書
 
-SYS -> EXCEL: Mapping nội dung\nvào template
-EXCEL -> EXCEL: Apply format\n(font, merge, border)
-EXCEL --> SYS: File 画面概要仕様書\nFile 画面遷移仕様書
+    SYS->>DB: Lưu Version Snapshot (Figma version ID + data)
+    SYS-->>BA: Trả về 2 file Excel + thông báo hoàn thành
 
-SYS -> DB: Lưu Version Snapshot\n(Figma version ID + data)
-SYS --> BA: Trả về 2 file Excel\n+ thông báo hoàn thành
+    BA->>BA: Review toàn bộ tài liệu
 
-BA -> BA: Review toàn bộ\ntài liệu
-alt Cần chỉnh sửa
-  BA -> EXCEL: Sửa thủ công
-else Approve
-  BA --> SYS: Xác nhận Approve
-  BA -> BA: Gửi tài liệu cho\nkhách hàng
-end
-
-@enduml
+    alt Cần chỉnh sửa
+        BA->>EXCEL: Sửa thủ công
+    else Approve
+        BA-->>SYS: Xác nhận Approve
+        BA->>BA: Gửi tài liệu cho khách hàng
+    end
 ```
 
 ---
 
 ## 2. Sequence – Update Mode
 
-```plantuml
-@startuml Sequence_UpdateMode
-!theme plain
-skinparam sequenceMessageAlign center
-title Sequence Diagram: Update Mode
+```mermaid
+sequenceDiagram
+    actor DS as Designer
+    actor BA as BA / BrSE
+    participant SYS as Hệ thống AI Assistant
+    participant FAPI as Figma API
+    participant DIFF as Diff Analyzer
+    participant AI as AI Engine
+    participant EXCEL as Excel Generator
+    participant DB as Version Store
 
-actor "Designer" as DS
-actor "BA / BrSE" as BA
-participant "Hệ thống\nAI Assistant" as SYS
-participant "Figma API" as FAPI
-participant "Diff\nAnalyzer" as DIFF
-participant "AI Engine" as AI
-participant "Excel\nGenerator" as EXCEL
-database "Version\nStore" as DB
+    DS->>DS: Cập nhật thiết kế trên Figma
+    BA->>SYS: Trigger Update Mode
 
-DS -> DS: Cập nhật thiết kế\ntrên Figma
-BA -> SYS: Trigger Update Mode
+    SYS->>FAPI: GET /files/{file_key} (phiên bản mới nhất)
+    FAPI-->>SYS: Dữ liệu Figma mới
 
-SYS -> FAPI: GET /files/{file_key}\n(phiên bản mới nhất)
-FAPI --> SYS: Dữ liệu Figma mới
+    SYS->>DB: Load Previous Snapshot
+    DB-->>SYS: Snapshot phiên bản trước
 
-SYS -> DB: Load Previous Snapshot
-DB --> SYS: Snapshot phiên bản trước
+    SYS->>DIFF: So sánh 2 phiên bản
+    DIFF-->>SYS: Danh sách thay đổi (Added / Modified / Deleted)
 
-SYS -> DIFF: So sánh 2 phiên bản
-DIFF --> SYS: Danh sách thay đổi\n(Added / Modified / Deleted)
+    alt Không có thay đổi
+        SYS-->>BA: Không phát hiện thay đổi
+    else Có thay đổi
+        loop Từng phần thay đổi
+            SYS->>AI: Gửi component thay đổi
+            AI-->>SYS: Nội dung tiếng Nhật mới
+        end
 
-alt Không có thay đổi
-  SYS --> BA: "Không phát hiện thay đổi"
-else Có thay đổi
-  loop Từng phần thay đổi
-    SYS -> AI: Gửi component thay đổi
-    AI --> SYS: Nội dung tiếng Nhật mới
-  end
+        SYS->>EXCEL: Merge nội dung mới vào section tương ứng
+        EXCEL->>EXCEL: Highlight vùng thay đổi (màu vàng)
+        EXCEL-->>SYS: File Excel đã cập nhật
 
-  SYS -> EXCEL: Merge nội dung mới\nvào section tương ứng
-  EXCEL -> EXCEL: Highlight vùng thay đổi\n(màu vàng)
-  EXCEL --> SYS: File Excel đã cập nhật
+        SYS->>SYS: Tạo Diff Report
+        SYS->>DB: Lưu New Snapshot
+        SYS-->>BA: File Excel + Diff Report
 
-  SYS -> SYS: Tạo Diff Report
-  SYS -> DB: Lưu New Snapshot
-  SYS --> BA: File Excel + Diff Report
+        BA->>BA: Review phần highlight (màu vàng)
 
-  BA -> BA: Review phần\nhighlight (màu vàng)
-  alt Cần chỉnh sửa
-    BA -> EXCEL: Sửa thủ công
-  else Approve
-    BA -> EXCEL: Xóa highlight
-    BA -> BA: Gửi tài liệu\ncập nhật cho khách
-  end
-end
-
-@enduml
+        alt Cần chỉnh sửa
+            BA->>EXCEL: Sửa thủ công
+        else Approve
+            BA->>EXCEL: Xóa highlight
+            BA->>BA: Gửi tài liệu cập nhật cho khách
+        end
+    end
 ```
 
 ---
 
 ## 3. Sequence – Xử lý Lỗi AI Generate
 
-```plantuml
-@startuml Sequence_ErrorHandling
-!theme plain
-title Sequence Diagram: Xử lý lỗi khi AI Generate thất bại
+```mermaid
+sequenceDiagram
+    participant SYS as Hệ thống
+    participant AI as AI Engine
+    actor BA as BA / BrSE
 
-participant "Hệ thống" as SYS
-participant "AI Engine" as AI
-actor "BA / BrSE" as BA
+    SYS->>AI: Gửi yêu cầu generate nội dung tiếng Nhật
+    AI-->>SYS: ❌ Lỗi / Timeout
 
-SYS -> AI: Gửi yêu cầu generate\nnội dung tiếng Nhật
-AI --> SYS: ❌ Lỗi / Timeout
+    SYS->>AI: Retry lần 1
+    AI-->>SYS: ❌ Lỗi
 
-SYS -> AI: Retry lần 1
-AI --> SYS: ❌ Lỗi
+    SYS->>AI: Retry lần 2
+    AI-->>SYS: ❌ Lỗi
 
-SYS -> AI: Retry lần 2
-AI --> SYS: ❌ Lỗi
+    SYS->>SYS: Đánh dấu component "【要確認】" trong Excel
+    SYS-->>BA: Thông báo "X components cần xử lý thủ công"
 
-SYS -> SYS: Đánh dấu component\n"【要確認】" trong Excel
-SYS --> BA: Thông báo:\n"X components cần xử lý thủ công"
-note over BA: BA xử lý thủ công\ncác component bị đánh dấu
-
-@enduml
+    Note over BA: BA xử lý thủ công các component bị đánh dấu
 ```

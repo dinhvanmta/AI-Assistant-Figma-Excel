@@ -1,33 +1,34 @@
-# Yêu Cầu Chức Năng
+---
+id: index
+title: Yêu Cầu Chức Năng
+sidebar_position: 1
+---
 
 ## 1. Danh sách Use Case
 
 ```mermaid
 flowchart LR
-    DS(["👨‍🎨 Designer"])
-    BA(["👤 BA / BrSE"])
-    AI(["🤖 AI Engine"])
+    DS(["Designer"])
+    BA(["BA / BrSE"])
+    AI(["AI Engine"])
 
-    subgraph SYS["Hệ thống AI Assistant"]
-        UC01["UC01: Tạo tài liệu lần đầu\n(Initial Setup)"]
-        UC02["UC02: Cập nhật tài liệu\n(Update Mode)"]
-        UC03["UC03: Review & Approve\ntài liệu"]
-        UC04["UC04: Xem báo cáo\nthay đổi (Diff)"]
-        UC05["UC05: Xuất file Excel\ntheo template"]
+    subgraph SYS["He thong AI Assistant"]
+        UC01["UC01: Initial Setup\n(Tao tai lieu lan dau)"]
+        UC02["UC02: Update Mode\n(Cap nhat tai lieu)"]
+        UC03["UC03: Review & Approve"]
+        UC04["UC04: Xem Diff Report"]
+        UC05["UC05: Xuat Excel\ntheo template"]
     end
 
-    DS -->|"Cung cấp Figma URL"| UC01
-    DS -->|"Cập nhật Figma"| UC02
-
-    BA -->|"Khởi động generate"| UC01
+    DS -->|"Cung cap Figma URL"| UC01
+    DS -->|"Cap nhat Figma"| UC02
+    BA -->|"Khoi dong generate"| UC01
     BA -->|"Trigger update"| UC02
     BA -->|"Review output"| UC03
     BA -->|"Xem diff report"| UC04
-
     AI --> UC01
     AI --> UC02
     AI --> UC05
-
     UC01 -.->|"include"| UC05
     UC02 -.->|"include"| UC04
     UC02 -.->|"include"| UC05
@@ -50,5 +51,5 @@ flowchart LR
 
 ## 3. Chi tiết từng Use Case
 
-- [UC01 – Initial Setup](./UC01_initial-setup.md)
-- [UC02 – Update Mode](./UC02_update-mode.md)
+- [UC01 – Initial Setup](./uc01-initial-setup)
+- [UC02 – Update Mode](./uc02-update-mode)
