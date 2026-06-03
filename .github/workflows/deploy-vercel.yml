@@ -13,23 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Install dependencies
-        working-directory: figma_convert_tool/docs-site
-        run: npm ci
-
-      - name: Build Docusaurus
-        working-directory: figma_convert_tool/docs-site
-        run: npm run build
-
       - name: Install Vercel CLI
         run: npm install -g vercel
 
       - name: Deploy to Vercel
-        working-directory: figma_convert_tool/docs-site/build
+        working-directory: figma_convert_tool
         run: vercel deploy --prod
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
